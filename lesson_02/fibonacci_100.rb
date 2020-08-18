@@ -1,6 +1,6 @@
-=begin
-Заполнить массив числами фибоначи до 100.
-=end
+# frozen_string_literal: true
+
+# Fill the array with Fibonacci numbers up to 100
 
 array = []
 
