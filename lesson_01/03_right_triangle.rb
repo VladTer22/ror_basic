@@ -17,15 +17,15 @@ b = gets.to_i
 print 'Set third triangle side: '
 c = gets.to_i
 
-if a > b && a > c
+if a > b && a > c && a < b + c
   h = a
   c1 = b
   c2 = c
-elsif b > a && b > c
+elsif b > a && b > c && b < a + c
   h = b
   c1 = a
   c2 = c
-elsif c > a && c > b
+elsif c > a && c > b && c < a + b
   h = c
   c1 = a
   c2 = b
