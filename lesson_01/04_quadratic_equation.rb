@@ -1,20 +1,21 @@
-=begin
-Квадратное уравнение. Пользователь вводит 3 коэффициента a, b и с. Программа вычисляет дискриминант (D) и корни уравнения (x1 и x2, если они есть) и выводит значения дискриминанта и корней на экран. При этом возможны следующие варианты:
-Если D > 0, то выводим дискриминант и 2 корня
-Если D = 0, то выводим дискриминант и 1 корень (т.к. они в этом случае равны)
-Если D < 0, то выводим дискриминант и сообщение "Корней нет"
-Подсказка: Алгоритм решения с блок-схемой (www.bolshoyvopros.ru). Для вычисления квадратного корня, нужно использовать  
-Math.sqrt
- Например,
-Math.sqrt(16)
-  вернет 4, т.е. квадратный корень из 16.
-=end
+# frozen_string_literal: true
 
-print "Set a: "
+# The user enters 3 coefficients a, b and c. The program calculates
+# the discriminant (D) and the roots of the equation (x1 and x2, if any)
+# and displays the values of the discriminant and roots on the screen.
+# In this case, the following options are possible:
+# If D> 0, then we derive the discriminant and 2 roots
+# If D = 0, then we print the discriminant and 1 root (they are equal)
+# If D <0, then display the discriminant and the message "No roots"
+# Hint: Solution algorithm with flowchart (www.bolshoyvopros.ru).
+# To calculate the square root, you need to use Math.sqrt
+# For example, Math.sqrt (16) will return 4, i.e. the square root of 16.
+
+print 'Set a: '
 a = gets.to_i
-print "Set b: "
+print 'Set b: '
 b = gets.to_i
-print "Set c: "
+print 'Set c: '
 c = gets.to_i
 
 d = b**2 - 4 * a * c
