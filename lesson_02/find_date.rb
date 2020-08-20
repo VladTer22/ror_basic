@@ -14,12 +14,14 @@ puts 'Set year: '
 year = gets.to_i
 
 months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+months[1] = 29 if (year % 400).zero? || year % 100 != 0 && (year % 4).zero?
 abort 'Invalid data!' unless day >= 1 && day <= months[month] && month >= 1 &&
                              month <= months.length && year >= 1 && year <= 2020
+abort 'You can\'t set this days quantity for this month!' if month == 2 && day > months[1]
 
-index = 0
-(month - 1).times { index += months[month] }
-index += day
-index += 1 if (year % 400).zero? || (year % 100 != 0 && year % 4).zero?
+days = 0
+index = month - 1
+index.times { days += months[index] }
+days += day
 
-puts "Ordinal number of the date is: #{index}"
+puts "Ordinal number of the date is: #{days}"

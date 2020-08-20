@@ -20,8 +20,17 @@ loop do
 
   puts 'Set price: '
   price = gets.to_f
+  if price.negative?
+    puts 'Price can\'t be negative! Set correct price: '
+    price = gets.to_f
+  end
+
   puts 'Set quantity: '
   quantity = gets.to_f
+  if quantity.negative?
+    puts 'Quantity can\'t be negative! Set correct quantity: '
+    quantity = gets.to_f
+  end
 
   cart[name] = { price: price, quantity: quantity }
 end
@@ -32,5 +41,5 @@ cart.each do |key, value|
   cart_price += sum
 end
 
-puts "Full cart price is #{cart_price}"
+puts "Full cart price is: #{cart_price}"
 p cart
