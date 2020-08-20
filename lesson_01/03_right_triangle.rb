@@ -30,7 +30,7 @@ elsif c > a && c > b && c < a + b
   c1 = a
   c2 = b
 else
-  abort "Triangle can't be right!"
+  abort "Triangle can't exist!"
 end
 
 if h**2 == c1**2 + c2**2 && c1 == c2
