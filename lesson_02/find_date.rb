@@ -20,9 +20,7 @@ abort 'Invalid data!' unless day >= 1 && day <= months[month - 1] && month >= 1 
 abort 'You can\'t set this days quantity for this month!' if month == 2 && day > months[1]
 
 days = 0
-months.each_with_index do |element, index|
-  days += element if index < month - 1
-end
+months.each_with_index { |element, index| days += element if index < month - 1 }
 days += day
 
 puts "Ordinal number of the date is: #{days}"
