@@ -15,13 +15,14 @@ year = gets.to_i
 
 months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 months[1] = 29 if (year % 400).zero? || year % 100 != 0 && (year % 4).zero?
-abort 'Invalid data!' unless day >= 1 && day <= months[month] && month >= 1 &&
+abort 'Invalid data!' unless day >= 1 && day <= months[month - 1] && month >= 1 &&
                              month <= months.length && year >= 1 && year <= 2020
 abort 'You can\'t set this days quantity for this month!' if month == 2 && day > months[1]
 
 days = 0
-index = month - 1
-index.times { days += months[index] }
+months.each_with_index do |element, index|
+  days += element if index < month - 1
+end
 days += day
 
 puts "Ordinal number of the date is: #{days}"
