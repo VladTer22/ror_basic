@@ -66,17 +66,16 @@ class Route
 
   def add_intermediate_station(station)
     stations.insert(-2, station)
-    puts "Station '#{station}' added"
+    "Station '#{station}' was added"
   end
 
   def remove_intermediate_station
     stations.delete_at(-2)
-    puts 'Last added station was deleted'
+    'Last added station was deleted'
   end
 
   def list_stations
-    i = 0
-    stations.each { |station| puts "#{i += 1} station is '#{station}'" }
+    "Stations of this route: #{stations.join(', ')}"
   end
 end
 
@@ -98,31 +97,23 @@ class Train
   end
 
   def show_speed
-    puts "Current speed is: #{speed}"
+    "Current speed is: #{speed}"
   end
 
   def stop
     @speed = 0
   end
 
-  def carriages?
-    puts "Current carriage quantity is: #{carriage_quantity}"
+  def list_carriages
+    "Current carriage quantity is: #{carriage_quantity}"
   end
 
   def attach_carriage
-    if speed.zero?
-      @carriage_quantity += 1
-    else
-      puts 'Stop train first!'
-    end
+    speed.zero? ? @carriage_quantity += 1 : 'Stop train first!'
   end
 
   def unhook_carriage
-    if speed.zero?
-      @carriage_quantity -= 1
-    else
-      puts 'Stop train first!'
-    end
+    speed.zero? ? @carriage_quantity -= 1 : 'Stop train first!'
   end
 
   def take_route(route)
@@ -132,25 +123,32 @@ class Train
     @local_station = @route.stations[@station_count]
   end
 
-  def move_forvard
-    @station_count += 1
-    @local_station = @route.stations[@station_count]
-  end
-
-  def move_back
-    @station_count += 1
-    @local_station = @route.stations[@station_count]
+  def move_forward
+    if @local_station == @route.stations.last
+      'This is final station!'
+    else
+      @station_count += 1
+      @local_station = @route.stations[@station_count]
+    end
   end
 
   def previous_station
-    puts "Previous station is: '#{route.stations[@station_count - 1]}'"
+    if @local_station == @route.stations.first
+      'It\'s first station on your route!'
+    else
+      "Previous station is: '#{route.stations[@station_count - 1]}'"
+    end
   end
 
   def current_station
-    puts "Currently train on '#{route.stations[@station_count]}' station"
+    "Currently train on '#{route.stations[@station_count]}' station"
   end
 
   def next_station
-    puts "Next station is: '#{route.stations[@station_count + 1]}'"
+    if @local_station == @route.stations.last
+      'It\'s last station on your route!'
+    else
+      "Next station is: '#{route.stations[@station_count + 1]}'"
+    end
   end
 end
