@@ -29,8 +29,10 @@ elsif c > a && c > b && c < a + b
   h = c
   c1 = a
   c2 = b
+elsif a == b && b == c
+  abort 'Triangle can\'t be right!'
 else
-  abort "Triangle can't exist!"
+  abort 'Triangle can\'t exist!'
 end
 
 if h**2 == c1**2 + c2**2 && c1 == c2
@@ -38,5 +40,5 @@ if h**2 == c1**2 + c2**2 && c1 == c2
 elsif h**2 == c1**2 + c2**2
   puts 'Right triangle.'
 else
-  puts "Triangle isn't right."
+  puts 'Triangle isn\'t right.'
 end
