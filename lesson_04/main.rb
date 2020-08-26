@@ -8,9 +8,12 @@ require_relative 'cargo_train'
 require_relative 'carriage'
 require_relative 'passenger_carriage'
 require_relative 'cargo_carriage'
+require_relative 'start'
 
 # Methods for interface options
 class Main
+  include Start
+
   def initialize
     @stations = {}
     @trains = {}
@@ -26,19 +29,24 @@ class Main
     puts "Station '#{name}' was created!"
   end
 
-  def create_train
+  def name_train
     puts 'Set train number: '
     self.number = gets.to_i
     puts 'Set train type: '
     self.type = gets.chomp
     puts 'Set carriage quantity and train sequence: '
     self.carriage_quantity = gets.to_i
+  end
 
+  def create_train
+    name_train
     train_check
     puts "Train of type '#{type}' N#{number} with #{carriage_quantity} carriages was created!"
   end
 
   def attach_carriage
+    abort 'You haven\'t any trains!' if @trains.empty?
+
     puts 'Set train number: '
     self.number = gets.to_i
     puts 'Set carriage type and train sequence: '
@@ -49,6 +57,8 @@ class Main
   end
 
   def unhook_carriage
+    abort 'You haven\'t any trains!' if @trains.empty?
+
     puts 'Set train number and it\'s sequence: '
     self.number = gets.to_i
 
@@ -57,6 +67,8 @@ class Main
   end
 
   def place_train
+    abort 'Create trains and stations first!' if @stations.empty? || @trains.empty?
+
     puts 'Set train number: '
     self.train_count = gets.to_i
     puts 'Set station name and count: '
@@ -67,10 +79,14 @@ class Main
   end
 
   def all_stations
+    abort 'You haven\'t any stations!' if @stations.empty?
+
     @stations.each { |key, value| puts "#{key} station is: '#{value.name}'" }
   end
 
   def placed_trains
+    abort 'Create trains and stations first!' if @stations.empty? || @trains.empty?
+
     puts 'Set station name and count: '
     self.name = gets.chomp
 
@@ -105,28 +121,19 @@ class Main
 
   def unhook_check
     sequence = gets.to_i
-    if @trains[sequence].number != number
-      abort 'This train don\'t exist!'
-    else
-      @trains[sequence].unhook_carriage
-    end
+    @trains[sequence].number != number ? (abort 'This train don\'t exist!') : @trains[sequence].unhook_carriage
   end
 
   def place_train_check
     count = gets.to_i
-    if @stations[count].name != name
-      abort 'This station don\'t exist!'
-    else
-      @stations[count].take_train(train_count)
-    end
+    @stations[count].name != name ? (abort 'This station don\'t exist!') : @stations[count].take_train(train_count)
   end
 
   def placed_trains_check
     count = gets.to_i
-    if @stations[count].name != name
-      abort 'This station don\'t exist!'
-    else
-      @stations[count].list_local_trains
-    end
+    @stations[count].name != name ? (abort 'This station don\'t exist!') : @stations[count].list_local_trains
   end
 end
+
+start = Main.new
+start.intro

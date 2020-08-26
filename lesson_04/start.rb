@@ -21,10 +21,8 @@
 #      - Place trains at the station
 #      - View station list and train list at station
 
-require_relative 'main'
-
 # User interface
-class Start < Main
+module Start
   attr_accessor :action
 
   def intro
@@ -40,8 +38,6 @@ class Start < Main
       station_cases
     end
   end
-
-  private
 
   def train_cases
     case action
@@ -69,6 +65,3 @@ class Start < Main
     end
   end
 end
-
-start = Start.new
-start.intro
