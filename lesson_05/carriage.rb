@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'company'
+
 # Carriage accessor
 class Carriage
   include Company
