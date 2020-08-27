@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'instance_counter'
+
 # Set the name, take and send trains, list all trains or by type
 class Station
   include InstanceCounter

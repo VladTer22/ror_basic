@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require_relative 'company'
+require_relative 'instance_counter'
+
 # Set train number, type and carriage quantity, set and show any speed
 # add, remove and list carriages, take route, set way and show location
 class Train
