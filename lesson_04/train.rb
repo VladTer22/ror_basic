@@ -5,14 +5,6 @@
 class Train
   attr_accessor :number, :type, :carriage_quantity, :speed, :route, :carriages
 
-  def initialize(number, type, carriage_quantity)
-    @number = number
-    @type = type
-    @carriage_quantity = carriage_quantity
-    @speed = 0
-    @carriages = Array.new(self.carriage_quantity, self.type)
-  end
-
   def accelerate(speed)
     self.speed += speed
   end
@@ -29,12 +21,8 @@ class Train
     "Current carriage quantity is: #{@carriages.length}"
   end
 
-  def attach_carriage(type)
-    self.type == type && speed.zero? ? @carriages.push(type) : 'It can\'t be done!'
-  end
-
   def unhook_carriage
-    speed.zero? ? @carriages.pop : 'Stop train first!'
+    speed.zero? ? @carriages.pop && @carriage_quantity -= 1 : 'Stop train first!'
   end
 
   def take_route(route)
