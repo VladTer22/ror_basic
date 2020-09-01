@@ -14,7 +14,7 @@ class Station
   end
 
   def list_local_trains
-    abort 'There are no trains at this station!' if train_count.empty?
+    return puts 'There are no trains at this station!' if train_count.empty?
 
     train_count.each { |train| puts "Here is train N#{train}" }
   end

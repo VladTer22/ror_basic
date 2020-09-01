@@ -24,7 +24,6 @@ class Train
     @type = type
     @carriage_quantity = carriage_quantity
     @speed = 0
-    @carriages = Array.new(self.carriage_quantity, self.type)
     @@trains[number] = self
     register_instance
   end
@@ -45,12 +44,8 @@ class Train
     "Current carriage quantity is: #{@carriages.length}"
   end
 
-  def attach_carriage(type)
-    self.type == type && speed.zero? ? @carriages.push(type) : 'It can\'t be done!'
-  end
-
   def unhook_carriage
-    speed.zero? ? @carriages.pop : 'Stop train first!'
+    speed.zero? ? @carriages.pop && @carriage_quantity -= 1 : 'Stop train first!'
   end
 
   def take_route(route)
