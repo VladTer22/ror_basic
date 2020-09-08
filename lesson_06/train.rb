@@ -37,16 +37,12 @@ class Train
     self.speed += speed
   end
 
-  def show_speed
-    "Current speed is: #{speed}"
-  end
-
   def stop
     self.speed = 0
   end
 
-  def list_carriages
-    "Current carriage quantity is: #{@carriages.length}"
+  def show_speed
+    "Current speed is: #{speed}"
   end
 
   def unhook_carriage

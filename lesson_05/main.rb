@@ -27,87 +27,81 @@ require_relative 'cargo_train'
 require_relative 'carriage'
 require_relative 'passenger_carriage'
 require_relative 'cargo_carriage'
-require_relative 'start'
 require_relative 'company'
 require_relative 'instance_counter'
 
 # Methods for interface options
+# rubocop:disable all
 class Main
-  include Start
+# rubocop:enable all
+  def intro
+    puts _message = "1 - Create station\n2 - Create train\n3 - Attach carriage\n" \
+                    "4 - Unhook carriage\n5 - List stations\n6 - Place train at the station\n" \
+                    "7 - Trains on stations\nOr any other key to exit!"
+    loop do
+      puts 'Choose action: '
+      action = gets.to_i
+      send(ACTIONS[action] || exit)
+    end
+  end
+
+  ACTIONS = { 1 => :create_station,  2 => :create_train,
+              3 => :attach_carriage, 4 => :unhook_carriage,
+              5 => :all_stations,    6 => :place_train,
+              7 => :placed_trains }.freeze
 
   def initialize
-    @stations = {}
+    @stations = []
     @trains = {}
   end
 
   def create_station
     puts 'Set station name: '
     name = gets.chomp
-    puts 'Set station count: '
-    count = gets.to_i
 
-    @stations[count] = Station.new(name)
+    @stations << Station.new(name)
     puts "Station '#{name}' was created!"
-  end
-
-  def name_train
-    puts 'Set train number: '
-    self.number = gets.to_i
-    puts "Set train type('passenger' or 'cargo'): "
-    self.type = gets.chomp
-    puts 'Set carriage quantity and train sequence: '
-    self.carriage_quantity = gets.to_i
   end
 
   def create_train
     name_train
     train_check
-    puts "Train of type '#{type}' N#{number} with #{carriage_quantity} carriages was created!"
+    puts "Train of type '#{type}' N'#{number}' with #{carriage_quantity} carriages was created"
   end
 
   def attach_carriage
-    return puts 'You haven\'t any trains!' if @trains.empty?
-
-    puts 'Set train number: '
-    self.number = gets.to_i
-    puts 'Set carriage type and train sequence: '
-    self.type = gets.chomp.to_sym
+    return 'You haven\'t any trains!' if @trains.empty?
 
     attach_check
   end
 
   def unhook_carriage
-    return puts 'You haven\'t any trains!' if @trains.empty?
+    return 'You haven\'t any trains!' if @trains.empty?
 
     puts 'Set train number and it\'s sequence: '
     self.number = gets.to_i
 
     unhook_check
-    puts "Last carriage was unhooked from train N#{number}"
-  end
-
-  def place_train
-    return puts 'Create trains and stations first!' if @stations.empty? || @trains.empty?
-
-    puts 'Set train number: '
-    self.train_count = gets.to_i
-    puts 'Set station name and count: '
-    self.name = gets.chomp
-
-    place_train_check
-    puts "Train N#{train_count} was placed on '#{name}' station"
+    puts "Last carriage was unhooked from train N'#{number}'"
   end
 
   def all_stations
-    return puts 'You haven\'t any stations!' if @stations.empty?
+    return 'You haven\'t any stations!' if @stations.empty?
 
-    @stations.each { |key, value| puts "#{key} station is: '#{value.name}'" }
+    @stations.each_with_index { |station, index| puts "#{index + 1} station: '#{station.name}'" }
+  end
+
+  def place_train
+    return 'Create trains and stations first!' if @stations.empty? || @trains.empty?
+
+    place_train_check
+    puts "Train N'#{number}' was placed on '#{name}' station"
   end
 
   def placed_trains
-    return puts 'Create trains and stations first!' if @stations.empty? || @trains.empty?
+    return 'Create trains and stations first!' if @stations.empty? || @trains.empty?
 
-    puts 'Set station name and count: '
+    puts 'Set station name: '
     self.name = gets.chomp
 
     placed_trains_check
@@ -115,46 +109,83 @@ class Main
 
   private
 
-  attr_accessor :type, :number, :carriage_quantity, :name, :train_count
+  attr_accessor :type, :number, :carriage_quantity, :name, :sequence, :chosen_station
+
+  def name_train
+    puts 'Set train number: '
+    self.number = gets.chomp
+    puts "Set train type('passenger' or 'cargo'): "
+    self.type = gets.chomp
+    puts 'Set carriage quantity and train sequence: '
+    self.carriage_quantity = gets.to_i
+    self.sequence = gets.to_i
+  end
 
   def train_check
-    sequence = gets.to_i
     if type == 'passenger'
       @trains[sequence] = PassengerTrain.new(number, carriage_quantity)
     elsif type == 'cargo'
       @trains[sequence] = CargoTrain.new(number, carriage_quantity)
     else
-      puts 'Wrong train type!'
+      'Wrong train type!'
     end
   end
 
+  def attach_name
+    puts 'Set train number: '
+    self.number = gets.chomp
+    puts 'Set carriage type and train sequence: '
+    self.type = gets.chomp.to_sym
+    self.sequence = gets.to_i
+  end
+
+  def attach
+    @trains[sequence].attach_carriage(type)
+    puts "Carriage '#{type}' was attached to train N'#{number}'"
+  end
+
   def attach_check
-    sequence = gets.to_i
+    attach_name
     if @trains[sequence].number != number
-      puts 'This train don\'t exist!'
+      'This train don\'t exist!'
     elsif @trains[sequence].type != type
-      puts 'Wrong carriage type!'
+      'Wrong carriage type!'
     else
-      @trains[sequence].attach_carriage(type)
-      puts "Carriage '#{type}' was attached to train N#{number}"
+      attach
     end
   end
 
   def unhook_check
-    sequence = gets.to_i
-    @trains[sequence].number != number ? (puts 'This train don\'t exist!') : @trains[sequence].unhook_carriage
+    self.sequence = gets.to_i
+    @trains[sequence].number != number ? 'This train don\'t exist!' : @trains[sequence].unhook_carriage
+  end
+
+  def place_name
+    puts 'Set train number and it\'s sequence: '
+    self.number = gets.chomp
+    self.sequence = gets.to_i
+    puts 'Set station name: '
+    self.name = gets.chomp
+  end
+
+  def station_check
+    self.chosen_station = Station.all.detect { |station| station.name == name }
+    return 'This station don\'t exist!' if chosen_station.nil?
   end
 
   def place_train_check
-    count = gets.to_i
-    @stations[count].name != name ? (puts 'This station don\'t exist!') : @stations[count].take_train(train_count)
+    place_name
+    station_check
+    chosen_station.take_train(@trains[sequence])
   end
 
   def placed_trains_check
-    count = gets.to_i
-    @stations[count].name != name ? (puts 'This station don\'t exist!') : @stations[count].list_local_trains
+    station_check
+    chosen_station.list_trains do |train|
+      puts "Train N: #{train.number}, type: #{train.type}, " \
+           "carriage quantity: #{train.carriage_quantity}"
+    end
   end
 end
 
-start = Main.new
-start.intro
+Main.new.intro

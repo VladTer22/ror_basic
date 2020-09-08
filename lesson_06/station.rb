@@ -32,18 +32,18 @@ class Station
     train_count.push(train)
   end
 
-  def list_local_trains
-    return puts 'There are no trains at this station!' if train_count.empty?
+  def send_train(train)
+    train_count.delete(train)
+  end
 
-    train_count.each { |train| puts "Here is train N#{train}" }
+  def list_trains
+    return 'There are no trains at this station!' if train_count.empty?
+
+    train_count.each { |train| yield train }
   end
 
   def local_trains_by_type(type)
-    train_count.each { |train| puts "Here is #{type} train N#{train}" if train.type == type }
-  end
-
-  def send_train(train)
-    train_count.delete(train)
+    train_count.each { |train| puts "Here is #{type} train N'#{train}'" if train.type == type }
   end
 
   protected
