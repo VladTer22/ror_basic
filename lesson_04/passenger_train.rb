@@ -7,8 +7,15 @@ class PassengerTrain < Train
     @type = :passenger
     @carriage_quantity = carriage_quantity
     @speed = 0
-    carriage = PassengerCarriage.new
-    @carriages = Array.new(self.carriage_quantity, carriage)
+    @carriages = []
+    init_carriages
+  end
+
+  def init_carriages
+    carriage_quantity.times do
+      carriage = PassengerCarriage.new
+      @carriages << carriage
+    end
   end
 
   def attach_carriage(type)

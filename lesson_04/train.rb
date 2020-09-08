@@ -5,20 +5,23 @@
 class Train
   attr_accessor :number, :type, :carriage_quantity, :speed, :route, :carriages
 
-  def accelerate(speed)
-    self.speed += speed
+  def initialize(number, type, carriage_quantity)
+    @number = number
+    @type = type
+    @carriage_quantity = carriage_quantity
+    @speed = 0
   end
 
-  def show_speed
-    "Current speed is: #{speed}"
+  def accelerate(speed)
+    self.speed += speed
   end
 
   def stop
     self.speed = 0
   end
 
-  def list_carriages
-    "Current carriage quantity is: #{@carriages.length}"
+  def show_speed
+    "Current speed is: #{speed}"
   end
 
   def unhook_carriage
