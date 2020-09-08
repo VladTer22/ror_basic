@@ -43,7 +43,7 @@ class Station
   end
 
   def local_trains_by_type(type)
-    train_count.each { |train| puts "Here is #{type} train N'#{train}'" if train.type == type }
+    train_count.each { |train| puts "Here is '#{type}' train N'#{train}'" if train.type == type }
   end
 
   protected

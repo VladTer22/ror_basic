@@ -9,18 +9,22 @@ class PassengerTrain < Train
     @speed = 0
     @carriages = []
     init_carriages
+    validate!
   end
 
   def init_carriages
+    total_seats = gets.to_i
     carriage_quantity.times do
-      carriage = PassengerCarriage.new
+      carriage = PassengerCarriage.new(total_seats)
       @carriages << carriage
     end
   end
 
   def attach_carriage(type)
     if self.type == type && speed.zero?
-      carriage = PassengerCarriage.new
+      puts 'Set number of seats: '
+      total_seats = gets.to_i
+      carriage = PassengerCarriage.new(total_seats)
       @carriages.push(carriage) && @carriage_quantity += 1
     else
       'It can\'t be done!'

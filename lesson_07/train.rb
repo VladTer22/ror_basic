@@ -45,6 +45,10 @@ class Train
     "Current speed is: #{speed}"
   end
 
+  def list_carriages
+    carriages.each_with_index { |carriage, index| yield(carriage, index) }
+  end
+
   def unhook_carriage
     speed.zero? ? @carriages.pop && @carriage_quantity -= 1 : 'Stop train first!'
   end

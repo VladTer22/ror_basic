@@ -1,27 +1,45 @@
 # frozen_string_literal: true
 
-# Implement data validation (validation) for all classes.
-# Check basic attributes (name, number, type, etc.) for presence,
-# length, etc. (depending on the attribute):
-#   - Validation should be called when creating an object, if the
-#   object is invalid, then an exception should be thrown
-#   - Should there be a valid method? which returns true if the
-#   object is valid and false otherwise.
-# Release a check for the train number format. Valid format:
-# three letters or numbers in any order, an optional hyphen
-# (maybe or not), and 2 more letters or numbers after the hyphen.
-# Remove all puts from classes (except for methods that should
-# display something on the screen), methods simply return values.
-# (We begin to fight for the purity of the code).
-# To release a simple text interface for creating trains (if you
-# have already implemented the interface, then add it):
-#   - The program asks the user for data to create a train (number
-#   and other necessary attributes)
-#   - If the attributes are valid, then we display information
-#   that such and such a train has been created
-#   - If the entered data is invalid, then the program should display a
-#   message about the errors that have occurred and re-request the data
-#   from the user. Implement this through an exception handling mechanism
+# For passenger cars:
+# Add an attribute of the total number of seats (set when creating a car)
+# Add a method that "takes up seats" in the carriage (one at a time)
+# Add a method that returns the number of occupied seats in the car
+# Add a method that returns the number of free seats in the carriage.
+
+# For freight cars:
+# Add an attribute of the total volume (set when creating a car)
+# Add a method that "occupies volume" in the car (the volume is specified
+# as a method parameter)
+# Add a method that returns the occupied space
+# Add a method that returns the remaining (available) volume
+
+# The Station class has:
+# write a method that takes a block and traverses all trains in a station,
+# passing each train into a block.
+
+# The Train class has:
+# write a method that takes a block and passes through all the cars of the
+# train (the cars must be in the internal array), passing each car object
+# to the block.
+
+# If there is no interface, then in a separate file, for example, main.rb,
+# write the code that:
+# Creates test data (stations, trains, carriages) and links them together.
+# Using the methods created within the task, write a code that iterates
+# through all stations sequentially and for each station displays a list
+# of trains in the format:
+#   - Train number, type, number of cars
+# And for each train at the station, display a list of cars in the format:
+#   - Car number (can be assigned automatically), car type, number of free
+# and occupied seats (for a passenger car) or number of free and occupied
+# space (for freight cars).
+
+# If you have an interface, then add features:
+# When creating a wagon, indicate the number of seats or the total volume,
+# depending on the type of wagon
+# Display a list of wagons by the train (in the format indicated above)
+# Display the list of trains at the station (in the above format)
+# Take up space or volume in the carriage
 
 require_relative 'station'
 require_relative 'route'
@@ -40,8 +58,9 @@ class Main
 # rubocop:enable all
   def intro
     puts _message = "1 - Create station\n2 - Create train\n3 - Attach carriage\n" \
-                    "4 - Unhook carriage\n5 - List stations\n6 - Place train at the station\n" \
-                    "7 - Trains on stations\nOr any other key to exit!"
+                    "4 - Unhook carriage\n5 - Fill carriage\n6 - List carriages\n" \
+                    "7 - List stations\n8 - Place train at the station\n" \
+                    "9 - Trains on stations\nOr any other key to exit!"
     loop do
       puts 'Choose action: '
       action = gets.to_i
@@ -51,8 +70,9 @@ class Main
 
   ACTIONS = { 1 => :create_station,  2 => :create_train,
               3 => :attach_carriage, 4 => :unhook_carriage,
-              5 => :all_stations,    6 => :place_train,
-              7 => :placed_trains }.freeze
+              5 => :fill_carriage,   6 => :train_carriages,
+              7 => :all_stations,    8 => :place_train,
+              9 => :placed_trains }.freeze
 
   def initialize
     @stations = []
@@ -64,7 +84,7 @@ class Main
     name = gets.chomp
 
     @stations << Station.new(name)
-    puts "Station '#{name}' was created!"
+    puts "Station '#{name}' was created"
   rescue StandardError => e
     puts "Error: #{e.message}"
   end
@@ -76,6 +96,17 @@ class Main
     puts "Train of type '#{type}' N'#{number}' with #{carriage_quantity} carriages was created"
   rescue StandardError => e
     puts "Error: #{e.message}"
+  end
+
+  def train_carriages
+    puts 'Set train number and it\'s sequence: '
+    number = gets.chomp
+    sequence = gets.to_i
+
+    @trains[sequence].list_carriages do |carriage, index|
+      puts "Train N'#{number}' #{index + 1} carriage type: #{carriage.type}, occupied: " \
+           "#{carriage.occupied_volume}, available: #{carriage.available_volume}"
+    end
   end
 
   def attach_carriage
@@ -96,6 +127,11 @@ class Main
     puts "Last carriage was unhooked from train N'#{number}'"
   rescue StandardError => e
     puts "Error: #{e.message}"
+  end
+
+  def fill_carriage
+    fill_check
+    puts "Carriage number #{carriage_number} of train N'#{number}' was succesfully filled"
   end
 
   def all_stations
@@ -126,7 +162,8 @@ class Main
 
   private
 
-  attr_accessor :type, :number, :carriage_quantity, :name, :sequence, :chosen_station
+  attr_accessor :type, :number, :carriage_quantity, :name, :sequence,
+                :chosen_station, :carriage_number, :chosen_carriage
 
   def name_train
     puts 'Set train number: '
@@ -138,11 +175,21 @@ class Main
     self.sequence = gets.to_i
   end
 
+  def passenger_train
+    puts 'Set number of seats: '
+    @trains[sequence] = PassengerTrain.new(number, carriage_quantity)
+  end
+
+  def cargo_train
+    puts 'Set carriages volume: '
+    @trains[sequence] = CargoTrain.new(number, carriage_quantity)
+  end
+
   def train_check
     if type == 'passenger'
-      @trains[sequence] = PassengerTrain.new(number, carriage_quantity)
+      passenger_train
     elsif type == 'cargo'
-      @trains[sequence] = CargoTrain.new(number, carriage_quantity)
+      cargo_train
     else
       raise 'Wrong train type!'
     end
@@ -175,6 +222,33 @@ class Main
   def unhook_check
     self.sequence = gets.to_i
     @trains[sequence].number != number ? 'This train don\'t exist!' : @trains[sequence].unhook_carriage
+  end
+
+  def fill_name
+    puts 'Set train number and it\'s sequence: '
+    self.number = gets.chomp
+    self.sequence = gets.to_i
+    puts 'Set carriage number: '
+    self.carriage_number = gets.to_i
+  end
+
+  def fill_cargo
+    puts 'Set the volume to be taken: '
+    volume = gets.to_i
+    return 'It\'s too hight!' if volume > chosen_carriage.available_volume
+
+    chosen_carriage.take_volume(volume)
+  end
+
+  def fill_check
+    fill_name
+    self.chosen_carriage = @trains[sequence].carriages[carriage_number - 1]
+    type = @trains[sequence].type
+    if type == :cargo
+      fill_cargo
+    elsif type == :passenger
+      chosen_carriage.take_volume
+    end
   end
 
   def place_name
