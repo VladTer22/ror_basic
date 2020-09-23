@@ -49,13 +49,14 @@ require_relative 'cargo_train'
 require_relative 'carriage'
 require_relative 'passenger_carriage'
 require_relative 'cargo_carriage'
+require_relative 'main_helper'
 require_relative 'company'
 require_relative 'instance_counter'
 
 # Methods for interface options
-# rubocop:disable all
 class Main
-# rubocop:enable all
+  include MainHelper
+
   def intro
     puts _message = "1 - Create station\n2 - Create train\n3 - Attach carriage\n" \
                     "4 - Unhook carriage\n5 - Fill carriage\n6 - List carriages\n" \
@@ -80,8 +81,7 @@ class Main
   end
 
   def create_station
-    puts 'Set station name: '
-    name = gets.chomp
+    station_name_checker
 
     @stations << Station.new(name)
     puts "Station '#{name}' was created"
@@ -92,25 +92,26 @@ class Main
   def create_train
     name_train
     train_check
-    raise 'Wrong train sequence!' until sequence.is_a?(Integer) && sequence.positive?
     puts "Train of type '#{type}' N'#{number}' with #{carriage_quantity} carriages was created"
   rescue StandardError => e
     puts "Error: #{e.message}"
   end
 
   def train_carriages
-    puts 'Set train number and it\'s sequence: '
-    number = gets.chomp
-    sequence = gets.to_i
+    raise 'Create train first!' if @trains.empty?
 
+    number_checker
+    sequence_checker
     @trains[sequence].list_carriages do |carriage, index|
       puts "Train N'#{number}' #{index + 1} carriage type: #{carriage.type}, occupied: " \
            "#{carriage.occupied_volume}, available: #{carriage.available_volume}"
     end
+  rescue StandardError => e
+    puts "Error: #{e.message}"
   end
 
   def attach_carriage
-    return 'You haven\'t any trains!' if @trains.empty?
+    raise 'Create train first!' if @trains.empty?
 
     attach_check
   rescue StandardError => e
@@ -118,30 +119,32 @@ class Main
   end
 
   def unhook_carriage
-    return 'You haven\'t any trains!' if @trains.empty?
-
-    puts 'Set train number and it\'s sequence: '
-    self.number = gets.chomp
+    raise 'Create train first!' if @trains.empty?
 
     unhook_check
-    puts "Last carriage was unhooked from train N'#{number}'"
   rescue StandardError => e
     puts "Error: #{e.message}"
   end
 
   def fill_carriage
+    raise 'Create train first!' if @trains.empty?
+
     fill_check
     puts "Carriage number #{carriage_number} of train N'#{number}' was succesfully filled"
+  rescue StandardError => e
+    puts "Error: #{e.message}"
   end
 
   def all_stations
-    return 'You haven\'t any stations!' if @stations.empty?
+    raise 'You haven\'t any stations!' if @stations.empty?
 
     @stations.each_with_index { |station, index| puts "#{index + 1} station: '#{station.name}'" }
+  rescue StandardError => e
+    puts "Error: #{e.message}"
   end
 
   def place_train
-    return 'Create trains and stations first!' if @stations.empty? || @trains.empty?
+    raise 'Create trains and stations first!' if @stations.empty? || @trains.empty?
 
     place_train_check
     puts "Train N'#{number}' was placed on '#{name}' station"
@@ -150,132 +153,12 @@ class Main
   end
 
   def placed_trains
-    return 'Create trains and stations first!' if @stations.empty? || @trains.empty?
+    raise 'Create trains and stations first!' if @stations.empty? || @trains.empty?
 
-    puts 'Set station name: '
-    self.name = gets.chomp
-
+    station_name_checker
     placed_trains_check
   rescue StandardError => e
     puts "Error: #{e.message}"
-  end
-
-  private
-
-  attr_accessor :type, :number, :carriage_quantity, :name, :sequence,
-                :chosen_station, :carriage_number, :chosen_carriage
-
-  def name_train
-    puts 'Set train number: '
-    self.number = gets.chomp
-    puts "Set train type('passenger' or 'cargo'): "
-    self.type = gets.chomp
-    puts 'Set carriage quantity and train sequence: '
-    self.carriage_quantity = gets.to_i
-    self.sequence = gets.to_i
-  end
-
-  def passenger_train
-    puts 'Set number of seats: '
-    @trains[sequence] = PassengerTrain.new(number, carriage_quantity)
-  end
-
-  def cargo_train
-    puts 'Set carriages volume: '
-    @trains[sequence] = CargoTrain.new(number, carriage_quantity)
-  end
-
-  def train_check
-    if type == 'passenger'
-      passenger_train
-    elsif type == 'cargo'
-      cargo_train
-    else
-      raise 'Wrong train type!'
-    end
-  end
-
-  def attach_name
-    puts 'Set train number: '
-    self.number = gets.chomp
-    puts 'Set carriage type and train sequence: '
-    self.type = gets.chomp.to_sym
-    self.sequence = gets.to_i
-  end
-
-  def attach
-    @trains[sequence].attach_carriage(type)
-    puts "Carriage '#{type}' was attached to train N'#{number}'"
-  end
-
-  def attach_check
-    attach_name
-    if @trains[sequence].number != number
-      'This train don\'t exist!'
-    elsif @trains[sequence].type != type
-      'Wrong carriage type!'
-    else
-      attach
-    end
-  end
-
-  def unhook_check
-    self.sequence = gets.to_i
-    @trains[sequence].number != number ? 'This train don\'t exist!' : @trains[sequence].unhook_carriage
-  end
-
-  def fill_name
-    puts 'Set train number and it\'s sequence: '
-    self.number = gets.chomp
-    self.sequence = gets.to_i
-    puts 'Set carriage number: '
-    self.carriage_number = gets.to_i
-  end
-
-  def fill_cargo
-    puts 'Set the volume to be taken: '
-    volume = gets.to_i
-    return 'It\'s too hight!' if volume > chosen_carriage.available_volume
-
-    chosen_carriage.take_volume(volume)
-  end
-
-  def fill_check
-    fill_name
-    self.chosen_carriage = @trains[sequence].carriages[carriage_number - 1]
-    type = @trains[sequence].type
-    if type == :cargo
-      fill_cargo
-    elsif type == :passenger
-      chosen_carriage.take_volume
-    end
-  end
-
-  def place_name
-    puts 'Set train number and it\'s sequence: '
-    self.number = gets.chomp
-    self.sequence = gets.to_i
-    puts 'Set station name: '
-    self.name = gets.chomp
-  end
-
-  def station_check
-    self.chosen_station = Station.all.detect { |station| station.name == name }
-    raise 'This station don\'t exist!' if chosen_station.nil?
-  end
-
-  def place_train_check
-    place_name
-    station_check
-    chosen_station.take_train(@trains[sequence])
-  end
-
-  def placed_trains_check
-    station_check
-    chosen_station.list_trains do |train|
-      puts "Train N: #{train.number}, type: #{train.type}, " \
-           "carriage quantity: #{train.carriage_quantity}"
-    end
   end
 end
 

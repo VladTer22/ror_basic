@@ -14,20 +14,20 @@ class PassengerTrain < Train
 
   def init_carriages
     total_seats = gets.to_i
+    raise 'Wrong number of seats!' until total_seats.is_a?(Integer) &&
+                                         total_seats.positive? && total_seats < 60
     carriage_quantity.times do
       carriage = PassengerCarriage.new(total_seats)
       @carriages << carriage
     end
   end
 
-  def attach_carriage(type)
-    if self.type == type && speed.zero?
-      puts 'Set number of seats: '
-      total_seats = gets.to_i
-      carriage = PassengerCarriage.new(total_seats)
-      @carriages.push(carriage) && @carriage_quantity += 1
-    else
-      'It can\'t be done!'
-    end
+  def attach_carriage
+    puts 'Set number of seats: '
+    total_seats = gets.to_i
+    raise 'Wrong number of seats!' until total_seats.is_a?(Integer) &&
+                                         total_seats.positiveseats < 60
+    carriage = PassengerCarriage.new(total_seats)
+    @carriages.push(carriage) && @carriage_quantity += 1
   end
 end

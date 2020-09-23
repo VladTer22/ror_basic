@@ -14,20 +14,20 @@ class CargoTrain < Train
 
   def init_carriages
     total_volume = gets.to_i
+    raise 'Wrong carriages volume!' until total_volume.is_a?(Integer) &&
+                                          total_volume.positive? && total_volume < 800
     carriage_quantity.times do
       carriage = CargoCarriage.new(total_volume)
       @carriages << carriage
     end
   end
 
-  def attach_carriage(type)
-    if self.type == type && speed.zero?
-      puts 'Set carriage volume: '
-      total_volume = gets.to_i
-      carriage = CargoCarriage.new(total_volume)
-      @carriages.push(carriage) && @carriage_quantity += 1
-    else
-      'It can\'t be done!'
-    end
+  def attach_carriage
+    puts 'Set carriage volume: '
+    total_volume = gets.to_i
+    raise 'Wrong carriages volume!' until total_volume.is_a?(Integer) &&
+                                          total_volume.positive? && total_volume < 800
+    carriage = CargoCarriage.new(total_volume)
+    @carriages.push(carriage) && @carriage_quantity += 1
   end
 end
