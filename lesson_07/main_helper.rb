@@ -5,13 +5,6 @@ module MainHelper
   attr_accessor :type, :number, :carriage_quantity, :name, :sequence,
                 :chosen_station, :carriage_number, :chosen_carriage
 
-  def name_train
-    number_checker
-    type_checker
-    carr_qty_checker
-    sequence_checker
-  end
-
   def passenger_train
     puts 'Set number of seats(up to 60): '
     @trains[sequence] = PassengerTrain.new(number, carriage_quantity)
@@ -30,19 +23,12 @@ module MainHelper
     end
   end
 
-  def attach_name
-    number_checker
-    type_checker
-    sequence_checker
-  end
-
   def attach
     @trains[sequence].attach_carriage
     puts "Carriage '#{type}' was attached to train N'#{number}'"
   end
 
   def attach_check
-    attach_name
     raise 'Wrong train number!' if @trains[sequence].number != number
     raise 'Wrong train type!' if @trains[sequence].type != type
 
@@ -50,18 +36,10 @@ module MainHelper
   end
 
   def unhook_check
-    number_checker
-    sequence_checker
     raise 'Wrong train number!' if @trains[sequence].number != number
 
     @trains[sequence].unhook_carriage
     puts "Last carriage was unhooked from train N'#{number}'"
-  end
-
-  def fill_name
-    number_checker
-    sequence_checker
-    carr_num_checker
   end
 
   def fill_cargo

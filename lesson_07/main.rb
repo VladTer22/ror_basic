@@ -90,7 +90,10 @@ class Main
   end
 
   def create_train
-    name_train
+    number_checker
+    type_checker
+    carr_qty_checker
+    sequence_checker
     train_check
     puts "Train of type '#{type}' N'#{number}' with #{carriage_quantity} carriages was created"
   rescue StandardError => e
@@ -113,6 +116,9 @@ class Main
   def attach_carriage
     raise 'Create train first!' if @trains.empty?
 
+    number_checker
+    type_checker
+    sequence_checker
     attach_check
   rescue StandardError => e
     puts "Error: #{e.message}"
@@ -121,6 +127,8 @@ class Main
   def unhook_carriage
     raise 'Create train first!' if @trains.empty?
 
+    number_checker
+    sequence_checker
     unhook_check
   rescue StandardError => e
     puts "Error: #{e.message}"
@@ -129,6 +137,9 @@ class Main
   def fill_carriage
     raise 'Create train first!' if @trains.empty?
 
+    number_checker
+    sequence_checker
+    carr_num_checker
     fill_check
     puts "Carriage number #{carriage_number} of train N'#{number}' was succesfully filled"
   rescue StandardError => e
