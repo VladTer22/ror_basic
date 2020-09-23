@@ -5,13 +5,10 @@ module MainHelper
   attr_accessor :type, :number, :carriage_quantity, :name, :sequence, :chosen_station
 
   def name_train
-    puts 'Set train number: '
-    self.number = gets.chomp
-    puts "Set train type('passenger' or 'cargo'): "
-    self.type = gets.chomp
-    puts 'Set carriage quantity and train sequence: '
-    self.carriage_quantity = gets.to_i
+    names_checker
+    qty_checker
     self.sequence = gets.to_i
+    raise 'Wrong train sequence!' until sequence.is_a?(Integer) && sequence.positive?
   end
 
   def train_check
@@ -19,8 +16,6 @@ module MainHelper
       @trains[sequence] = PassengerTrain.new(number, carriage_quantity)
     elsif type == 'cargo'
       @trains[sequence] = CargoTrain.new(number, carriage_quantity)
-    else
-      raise 'Wrong train type!'
     end
   end
 
@@ -78,5 +73,23 @@ module MainHelper
       puts "Train N: #{train.number}, type: #{train.type}, " \
            "carriage quantity: #{train.carriage_quantity}"
     end
+  end
+
+  private
+
+  def names_checker
+    puts 'Set train number: '
+    self.number = gets.chomp
+    raise 'Wrong train number!' if number !~ /^[a-z0-9]{3}-?[a-z0-9]{2}$/i
+
+    puts "Set train type('passenger' or 'cargo'): "
+    self.type = gets.chomp
+    raise 'Wrong train type!' until type == ('cargo' || 'passenger')
+  end
+
+  def qty_checker
+    puts 'Set carriage quantity and train sequence: '
+    self.carriage_quantity = gets.to_i
+    raise 'Wrong carriage quantity!' until carriage_quantity.is_a?(Integer) && carriage_quantity.positive?
   end
 end

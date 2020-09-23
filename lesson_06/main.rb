@@ -73,14 +73,13 @@ class Main
   def create_train
     name_train
     train_check
-    raise 'Wrong train sequence!' until sequence.is_a?(Integer) && sequence.positive?
     puts "Train of type '#{type}' N'#{number}' with #{carriage_quantity} carriages was created"
   rescue StandardError => e
     puts "Error: #{e.message}"
   end
 
   def attach_carriage
-    return 'You haven\'t any trains!' if @trains.empty?
+    raise 'You haven\'t any trains!' if @trains.empty?
 
     attach_check
   rescue StandardError => e
@@ -88,7 +87,7 @@ class Main
   end
 
   def unhook_carriage
-    return 'You haven\'t any trains!' if @trains.empty?
+    raise 'You haven\'t any trains!' if @trains.empty?
 
     puts 'Set train number and it\'s sequence: '
     self.number = gets.chomp
@@ -100,13 +99,15 @@ class Main
   end
 
   def all_stations
-    return 'You haven\'t any stations!' if @stations.empty?
+    raise 'You haven\'t any stations!' if @stations.empty?
 
     @stations.each_with_index { |station, index| puts "#{index + 1} station: '#{station.name}'" }
+  rescue StandardError => e
+    puts "Error: #{e.message}"
   end
 
   def place_train
-    return 'Create trains and stations first!' if @stations.empty? || @trains.empty?
+    raise 'Create trains and stations first!' if @stations.empty? || @trains.empty?
 
     place_train_check
     puts "Train N'#{number}' was placed on '#{name}' station"
@@ -115,7 +116,7 @@ class Main
   end
 
   def placed_trains
-    return 'Create trains and stations first!' if @stations.empty? || @trains.empty?
+    raise 'Create trains and stations first!' if @stations.empty? || @trains.empty?
 
     puts 'Set station name: '
     self.name = gets.chomp
