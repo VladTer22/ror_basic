@@ -26,7 +26,7 @@ class PassengerTrain < Train
     puts 'Set number of seats: '
     total_seats = gets.to_i
     raise 'Wrong number of seats!' until total_seats.is_a?(Integer) &&
-                                         total_seats.positiveseats < 60
+                                         total_seats.positive? && total_seats < 60
     carriage = PassengerCarriage.new(total_seats)
     @carriages.push(carriage) && @carriage_quantity += 1
   end
